@@ -45,6 +45,7 @@ Kurve.Game = {
     CURRENT_FRAME_ID:       0,
     startTime:              0,
     timeIntervalId:         null,
+    nextSpeedupFrame:       0,
     
     init: function() {
         this.fps = Kurve.Config.Game.fps;
@@ -66,7 +67,10 @@ Kurve.Game = {
                 this.runningCurves[i][j].drawNextFrame();
             }
         }
-        if(this.timeLeft<0){
+        if(this.deathMatch){
+            this.speedUp()
+        }
+        if(this.timeLeft()<0 && !this.deathMatch){
             this.terminateRound();
         }
     },
@@ -80,8 +84,11 @@ Kurve.Game = {
         if (timeLeft < 10){
             this.timeLeftElement.classList.add("shake")
         }
-        if (timeLeft > 0){
-            this.timeLeftElement.innerHTML= Math.floor(timeLeft/60)+":"+timeLeft%60;
+        if (timeLeft >= 0){
+            this.timeLeftElement.innerHTML= Math.floor(timeLeft/60)+":"+('0'+timeLeft%60).slice(-2);
+        }
+        else{
+            this.timeLeftElement.innerHTML= "00:00";
         }
     },
     
@@ -147,6 +154,7 @@ Kurve.Game = {
     
     startGame: function() {
         this.maxPoints = (this.curves.length - 1) * 10;
+        this.deathMatch = false;
         
         this.addPlayers();
         this.addWindowListeners();
@@ -169,6 +177,8 @@ Kurve.Game = {
     },
     endTimeTracking: function(){
         this.startTime = 0
+        this.timeLeftElement.innerHTML = ""
+        this.timeLeftElement.classList.remove("shake")
         clearInterval(this.timeIntervalId)
     },
     
@@ -226,6 +236,7 @@ Kurve.Game = {
         Kurve.Field.clearFieldContent();
         this.initRun();
         this.renderPlayerScores();
+        this.initSpeedup();
 
         setTimeout(this.startRun.bind(this), Kurve.Config.Game.startDelay);
         this.Audio.startNewRound();
@@ -233,6 +244,25 @@ Kurve.Game = {
     
     startRun: function() {
         this.isRunning = true;
+        this.runIntervalId = setInterval(this.run.bind(this), this.intervalTimeOut);
+    },
+
+    initSpeedup: function(){
+        this.intervalTimeOut = Math.round(1000 / this.fps);
+        this.nextSpeedupFrame = this.CURRENT_FRAME_ID + Math.ceil(Kurve.Config.Game.speedUpTime*1000/this.intervalTimeOut)
+        var fpsElement = document.getElementById("fps")
+        fpsElement.innerHTML = "fps:"+Math.ceil(1000/this.intervalTimeOut)
+    },
+    speedUp: function(){
+        if(this.CURRENT_FRAME_ID < this.nextSpeedupFrame){return;}
+        this.intervalTimeOut = this.intervalTimeOut*0.9;
+        var fpsElement = document.getElementById("fps")
+        fpsElement.innerHTML = "fps:"+Math.ceil(1000/this.intervalTimeOut)
+        fpsElement.classList.add("highlight")
+        setTimeout(function(){fpsElement.classList.remove("highlight")},750)
+        console.log("new fps:"+1000/this.intervalTimeOut)
+        this.nextSpeedupFrame = this.CURRENT_FRAME_ID + Math.ceil(Kurve.Config.Game.speedUpTime*1000/this.intervalTimeOut)
+        clearInterval(this.runIntervalId);
         this.runIntervalId = setInterval(this.run.bind(this), this.intervalTimeOut);
     },
     
@@ -246,7 +276,6 @@ Kurve.Game = {
                 this.runningCurves[i][j].drawNextFrame();
             }
         }
-        this.drawTimeLeft();
     },
     
     initRun: function() {

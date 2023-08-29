@@ -33,7 +33,16 @@
 }
 
 @keyframes grow {
-  50% {
+  10% {
     font-size: 300%;
+  }
+  20% {
+    font-size: 300%;
+  }
+}
+
+@keyframes highlight{
+  10% {
+    color: red;
   }
 }

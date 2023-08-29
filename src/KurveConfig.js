@@ -49,11 +49,12 @@ Kurve.Config = {
     },
     
     Game: {
-        menuStartDelay:2,
+        menuStartDelay:5,
         timeForRound: 30,
         startDelay: 1000,
         fps: 60,
         initialSuperpowerCount: 2,
+        speedUpTime: 1,
     },
 
     Superpower: {

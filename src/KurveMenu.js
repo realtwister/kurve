@@ -115,9 +115,13 @@ Kurve.Menu = {
         }
         this.isCountingDown = true;
         console.log("starting countdown")
+        document.getElementById('menu-count-down').classList.remove("grow")
         this.count = Kurve.Config.Game.menuStartDelay;
         this.countDownInterval = setInterval(function() {
             document.getElementById('menu-count-down').innerHTML = "AAACHTUUUNNGG..."+this.count;
+            if(this.count <= 2){
+                document.getElementById('menu-count-down').classList.add("grow")
+            }
             if(!Kurve.players.every(player=> player.isActive())){
                 console.log("stopped early")
                 this.stopCountingDown()

@@ -315,14 +315,22 @@ p {
     text-align: center;
     font-size: 30px;
     &.shake {
-        animation: 1s ease 0.1s grow infinite;
+        animation: 1s ease-out grow infinite;
+    }
+}
+#fps{
+    text-align: right;
+    &.highlight{
+        animation: .8s ease highlight;
     }
 }
 
 #menu-count-down{
     text-align: center;
     font-size: 30px;
-    animation: 1s linear 0.5s grow infinite;
+    &.grow{
+        animation: 10s ease-in grow;
+    }
 }
 
 #lightbox-overlay {

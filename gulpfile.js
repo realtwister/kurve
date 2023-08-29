@@ -59,8 +59,8 @@ gulp.task('build', gulp.series('js', 'sass', 'images', 'sound'));
 gulp.task('default', gulp.series('build'));
 
 gulp.task('watch', function() {
+    gulp.watch(["scss/*"], gulp.series("sass"))
     gulp.watch([
-        'src/*',
-        'scss/*'
+        'src/*'
     ], gulp.series('build'))
 });
