@@ -40,14 +40,17 @@ Kurve.Game = {
     isPaused:               false,
     isRoundStarted:         false,
     playerScoresElement:    null,
+    timeLeftElement:        null,
     isGameOver:             false,
     CURRENT_FRAME_ID:       0,
+    startTime:              0,
+    timeIntervalId:         null,
     
     init: function() {
         this.fps = Kurve.Config.Game.fps;
         this.intervalTimeOut = Math.round(1000 / this.fps);
         this.playerScoresElement = document.getElementById('player-scores');
-
+        this.timeLeftElement = document.getElementById('time-left');
         this.Audio.init();
     },
     
@@ -62,6 +65,23 @@ Kurve.Game = {
             for (var j = 0; this.runningCurves[i] && j < this.runningCurves[i].length; ++j) {
                 this.runningCurves[i][j].drawNextFrame();
             }
+        }
+        if(this.timeLeft<0){
+            this.terminateRound();
+        }
+    },
+
+    timeLeft: function(){
+        return Math.floor((this.startTime- Date.now())/1000)+Kurve.Config.Game.timeForRound;
+    },
+
+    drawTimeLeft: function(){
+        var timeLeft = this.timeLeft();
+        if (timeLeft < 10){
+            this.timeLeftElement.classList.add("shake")
+        }
+        if (timeLeft > 0){
+            this.timeLeftElement.innerHTML= Math.floor(timeLeft/60)+":"+timeLeft%60;
         }
     },
     
@@ -93,8 +113,8 @@ Kurve.Game = {
     },
     
     onSpaceDown: function() {
-        if ( this.isGameOver ) return location.reload();
-        if ( this.isRunning || this.isPaused ) return this.togglePause();
+        // if ( this.isGameOver ) return location.reload();
+        // if ( this.isRunning || this.isPaused ) return this.togglePause();
         if ( !this.isRoundStarted && !this.deathMatch) return this.startNewRound();
         if ( !this.isRoundStarted && this.deathMatch) return this.startDeathMatch();
     },
@@ -135,8 +155,21 @@ Kurve.Game = {
         Kurve.Piwik.trackPageVariable(1, 'theme', Kurve.Theming.currentTheme);
         Kurve.Piwik.trackPageVariable(2, 'number_of_players', this.players.length);
         Kurve.Piwik.trackPageView('Game');
-        
+        this.startTimeTracking()
+
         this.startNewRound.bind(this);
+        this.startNewRound();
+    },
+
+    startTimeTracking: function(){
+        if(this.startTime==0){
+            this.startTime = Date.now()
+            this.timeIntervalId = setInterval(this.drawTimeLeft.bind(this), 500)
+        }
+    },
+    endTimeTracking: function(){
+        this.startTime = 0
+        clearInterval(this.timeIntervalId)
     },
     
     renderPlayerScores: function() {
@@ -154,9 +187,9 @@ Kurve.Game = {
     
     addPlayers: function() {
         Kurve.Game.curves.forEach(function(curve) {
-            for (var i=0; i<Kurve.Config.Game.initialSuperpowerCount; i++) {
-                curve.getPlayer().getSuperpower().incrementCount();
-            }
+            // for (var i=0; i<Kurve.Config.Game.initialSuperpowerCount; i++) {
+            //     curve.getPlayer().getSuperpower().incrementCount();
+            // }
 
             Kurve.Game.players.push( curve.getPlayer() );
         });
@@ -206,6 +239,14 @@ Kurve.Game = {
     stopRun: function() {
         this.isRunning = false;
         clearInterval(this.runIntervalId);
+        this.CURRENT_FRAME_ID++;
+
+        for (var i in this.runningCurves) {
+            for (var j = 0; this.runningCurves[i] && j < this.runningCurves[i].length; ++j) {
+                this.runningCurves[i][j].drawNextFrame();
+            }
+        }
+        this.drawTimeLeft();
     },
     
     initRun: function() {
@@ -235,7 +276,14 @@ Kurve.Game = {
         this.incrementSuperpowers();
         this.Audio.terminateRound();
         Kurve.Field.resize();
-        this.checkForWinner();
+        if(this.timeLeft() > 0 ){
+            this.startNewRound();
+        }
+        else{
+            console.log("done")
+            this.endTimeTracking()
+            this.checkForWinner();
+        }
     },
 
     incrementSuperpowers: function() {
@@ -260,10 +308,14 @@ Kurve.Game = {
         if ( this.deathMatch ) return;
 
         var winners = [];
+
+        var maxpoints = Math.max(...(this.players.map(player => player.getPoints())))
+        console.log(this.maxpoints)
         
         this.players.forEach(function(player) {
-            if (player.getPoints() >= Kurve.Game.maxPoints) winners.push(player);
+            if (player.getPoints() >= maxpoints) winners.push(player);
         });
+        console.log(winners)
         
         if (winners.length === 0) return;
         if (winners.length === 1) this.gameOver(winners[0]);

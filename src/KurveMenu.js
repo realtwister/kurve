@@ -29,11 +29,14 @@ Kurve.Menu = {
     boundOnKeyDown: null,
     audioPlayer: null,
     scrollKeys: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Spacebar', ' '],
+    countDownInterval: null,
+    count: null,
+    isCountingDown: false,
     
     init: function() {
         this.initPlayerMenu();
         this.addWindowListeners();
-        this.addMouseListeners();
+        //this.addMouseListeners();
         this.initMenuMusic();
     },
         
@@ -94,14 +97,50 @@ Kurve.Menu = {
             } else if ( player.isKeyRight(event.keyCode) ) {
                 Kurve.Menu.deactivatePlayer(player.getId());
                 Kurve.Menu.audioPlayer.play('menu-navigate');
-            } else if ( player.isKeySuperpower(event.keyCode) ) {
-                Kurve.Menu.nextSuperpower(player.getId());
-                Kurve.Menu.audioPlayer.play('menu-navigate');
-            }
+            } 
+            // else if ( player.isKeySuperpower(event.keyCode) ) {
+            //     Kurve.Menu.nextSuperpower(player.getId());
+            //     Kurve.Menu.audioPlayer.play('menu-navigate');
+            // }
         });
+
+        if(Kurve.players.every(player=> player.isActive())){
+            this.startCountDown();
+        }
     },
-    
-    onSpaceDown: function() {
+
+    startCountDown: function(){
+        if(this.isCountingDown){
+            return;
+        }
+        this.isCountingDown = true;
+        console.log("starting countdown")
+        this.count = Kurve.Config.Game.menuStartDelay;
+        this.countDownInterval = setInterval(function() {
+            document.getElementById('menu-count-down').innerHTML = "AAACHTUUUNNGG..."+this.count;
+            if(!Kurve.players.every(player=> player.isActive())){
+                console.log("stopped early")
+                this.stopCountingDown()
+            }
+            else if(this.count <= 0){
+                this.stopCountingDown()
+                this.startGame()
+            }
+            this.count -= 1;
+        }.bind(this),1000);
+    },
+
+    stopCountingDown: function(){
+        if(this.isCountingDown){
+        document.getElementById('menu-count-down').innerHTML = ""
+        clearInterval(this.countDownInterval)
+        this.isCountingDown=false;
+        } else{
+            console.log("tried to stop counting down but not counting.")
+        }
+    },
+
+    startGame: function(){
         Kurve.players.forEach(function(player) {
             if ( player.isActive() ) {
                 Kurve.Game.curves.push(
@@ -109,8 +148,8 @@ Kurve.Menu = {
                 );    
             }
         });
-        
-        if (Kurve.Game.curves.length <= 1) {
+
+        if (Kurve.Game.curves.length <= 0) {
             Kurve.Game.curves = [];
             Kurve.Menu.audioPlayer.play('menu-error', {reset: true});
 
@@ -129,6 +168,10 @@ Kurve.Menu = {
 
         u.addClass('hidden', 'layer-menu');
         u.removeClass('hidden', 'layer-game');
+    },
+    
+    onSpaceDown: function() {
+        this.startGame();
     },
 
     onNextSuperPowerClicked: function(event, playerId) {

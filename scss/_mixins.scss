@@ -31,3 +31,9 @@
     @include transform(none);
   }
 }
+
+@keyframes grow {
+  50% {
+    font-size: 300%;
+  }
+}

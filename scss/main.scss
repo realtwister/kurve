@@ -311,6 +311,20 @@ p {
     }
 }
 
+#time-left {
+    text-align: center;
+    font-size: 30px;
+    &.shake {
+        animation: 1s ease 0.1s grow infinite;
+    }
+}
+
+#menu-count-down{
+    text-align: center;
+    font-size: 30px;
+    animation: 1s linear 0.5s grow infinite;
+}
+
 #lightbox-overlay {
     position: fixed;
     left: 0;

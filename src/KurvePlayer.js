@@ -65,16 +65,16 @@ Kurve.Player.prototype.renderMenuItem = function() {
                 '<div class="title light"><h2>' + this.getId() + '</h2></div>' +
                 '<div class="key left light"><div>' + this.getKeyLeftChar() + '</div></div>' +
                 '<div class="key right light"><div>' + this.getKeyRightChar() + '</div></div>' +
-                '<div class="superpower">' +
-                    '<div class="key light">' + this.getKeySuperpowerChar() + '</div>' +
-                    '<div class="superpowerType light">' +
-                        '<div class="left" onclick="Kurve.Menu.onPreviousSuperPowerClicked(event, \'' + this.getId() + '\')"><i class="arrow arrow-left"></i></div>' +
-                        '<div class="superpowers">' +
-                            '<div id="' + this.getId() + '-superpower">' + this.getSuperpower().getLabel() + '</div>' +
-                        '</div> ' +
-                        '<div class="right" onclick="Kurve.Menu.onNextSuperPowerClicked(event, \'' + this.getId() + '\')"><i class="arrow arrow-right"></i></div>' +
-                    '</div> ' +
-                '</div>' +
+                // '<div class="superpower">' +
+                //     '<div class="key light">' + this.getKeySuperpowerChar() + '</div>' +
+                //     '<div class="superpowerType light">' +
+                //         '<div class="left" onclick="Kurve.Menu.onPreviousSuperPowerClicked(event, \'' + this.getId() + '\')"><i class="arrow arrow-left"></i></div>' +
+                //         '<div class="superpowers">' +
+                //             '<div id="' + this.getId() + '-superpower">' + this.getSuperpower().getLabel() + '</div>' +
+                //         '</div> ' +
+                //         '<div class="right" onclick="Kurve.Menu.onNextSuperPowerClicked(event, \'' + this.getId() + '\')"><i class="arrow arrow-right"></i></div>' +
+                //     '</div> ' +
+                // '</div>' +
                 '<div class="clear"></div>' +
             '</div>';
 };
@@ -84,10 +84,10 @@ Kurve.Player.prototype.renderScoreItem = function() {
                 '<div class="title"><h2>' + this.getId() + '</h2></div>' +
                 '<div class="points">' + this.getPoints() + '</div>' +
                 '<div class="clear"></div>' +
-                '<div class="superpowers">' +
-                    this.renderNumberOfSuperPowers() +
-                    '<span class="superpower-label">' + this.getSuperpower().getLabel() + '</span>' +
-                '</div>' +
+                // '<div class="superpowers">' +
+                //     this.renderNumberOfSuperPowers() +
+                //     '<span class="superpower-label">' + this.getSuperpower().getLabel() + '</span>' +
+                // '</div>' +
             '</div>';
 };
 
