@@ -46,13 +46,14 @@ Kurve.Game = {
     startTime:              0,
     timeIntervalId:         null,
     nextSpeedupFrame:       0,
+    currentTimeLeft:        0,
     
     init: function() {
         this.fps = Kurve.Config.Game.fps;
         this.intervalTimeOut = Math.round(1000 / this.fps);
         this.playerScoresElement = document.getElementById('player-scores');
-        this.timeLeftElement = document.getElementById('time-left');
         this.Audio.init();
+        this.Timer.init(Kurve.Config.Game.timeForRound, this.terminateRound.bind(this), document.getElementById('time-left'), this.Audio);
     },
     
     run: function() {
@@ -69,26 +70,6 @@ Kurve.Game = {
         }
         if(this.deathMatch){
             this.speedUp()
-        }
-        if(this.timeLeft()<0 && !this.deathMatch){
-            this.terminateRound();
-        }
-    },
-
-    timeLeft: function(){
-        return Math.floor((this.startTime- Date.now())/1000)+Kurve.Config.Game.timeForRound;
-    },
-
-    drawTimeLeft: function(){
-        var timeLeft = this.timeLeft();
-        if (timeLeft < 10){
-            this.timeLeftElement.classList.add("shake")
-        }
-        if (timeLeft >= 0){
-            this.timeLeftElement.innerHTML= Math.floor(timeLeft/60)+":"+('0'+timeLeft%60).slice(-2);
-        }
-        else{
-            this.timeLeftElement.innerHTML= "00:00";
         }
     },
     
@@ -163,23 +144,10 @@ Kurve.Game = {
         Kurve.Piwik.trackPageVariable(1, 'theme', Kurve.Theming.currentTheme);
         Kurve.Piwik.trackPageVariable(2, 'number_of_players', this.players.length);
         Kurve.Piwik.trackPageView('Game');
-        this.startTimeTracking()
+        this.Timer.start();
 
         this.startNewRound.bind(this);
         this.startNewRound();
-    },
-
-    startTimeTracking: function(){
-        if(this.startTime==0){
-            this.startTime = Date.now()
-            this.timeIntervalId = setInterval(this.drawTimeLeft.bind(this), 500)
-        }
-    },
-    endTimeTracking: function(){
-        this.startTime = 0
-        this.timeLeftElement.innerHTML = ""
-        this.timeLeftElement.classList.remove("shake")
-        clearInterval(this.timeIntervalId)
     },
     
     renderPlayerScores: function() {
@@ -305,12 +273,11 @@ Kurve.Game = {
         this.incrementSuperpowers();
         this.Audio.terminateRound();
         Kurve.Field.resize();
-        if(this.timeLeft() > 0 ){
+        if(this.Timer.timeLeft() > 0 ){
             this.startNewRound();
         }
         else{
             console.log("done")
-            this.endTimeTracking()
             this.checkForWinner();
         }
     },
@@ -430,6 +397,10 @@ Kurve.Game = {
             this.audioPlayer.play('game-end');
         },
 
+        clockTick: function(){
+            this.audioPlayer.play('game-pause-in');
+        },
+
         pauseIn: function() {
             this.audioPlayer.play('game-pause-in');
             this.setAllCurvesMuted('all', true);
@@ -496,5 +467,58 @@ Kurve.Game = {
                 curve.pause(soundKey, options);
             });
         }
+    },
+    Timer:{
+        startTime: 0,
+        timeLeftPrevious: 0,
+        timeToRunTotal: 0,
+        timeLeftElement: null,
+        timeIntervalId: null,
+        callback: null,
+        audio: null,
+
+        init: function(timeToRun, callback, timeLeftElement, audio){
+            this.callback = callback;
+            this.timeToRunTotal = timeToRun;
+            this.timeLeftElement = timeLeftElement;
+            this.audio = audio;
+        },
+
+        start: function(){
+            if(this.startTime==0){
+                this.startTime = Date.now();
+                this.timeIntervalId = setInterval(this.tick.bind(this), 100);
+                this.timeLeftElement.classList.remove("shake")
+            }
+        },
+        stop: function(){
+            this.startTime = 0
+            this.timeLeftElement.innerHTML = ""
+            this.timeLeftElement.classList.remove("shake")
+            clearInterval(this.timeIntervalId)
+        },
+        tick: function(){
+            var timeLeft = this.timeLeft();
+            if (timeLeft == this.timeLeftPrevious){return;}
+            if (timeLeft <= 10){
+                if (this.timeLeftPrevious >10){
+                    this.timeLeftElement.classList.add("shake")
+                }
+                this.audio.clockTick();
+            }
+            if (timeLeft >= 0){
+                this.timeLeftElement.innerHTML= Math.floor(timeLeft/60)+":"+('0'+timeLeft%60).slice(-2);
+            }
+            else{
+                this.stop();
+                console.log("Timer Finished");
+                this.callback();
+            }
+            this.timeLeftPrevious = timeLeft;
+        },
+        timeLeft: function(){
+            return Math.ceil((this.startTime- Date.now())/1000)+Kurve.Config.Game.timeForRound;
+        },
+
     }
 };
