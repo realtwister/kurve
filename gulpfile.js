@@ -32,10 +32,10 @@ var kurveLibs = [
 
 gulp.task('js', function(done) {
     gulp.src(kurveLibs.concat(kurveSources))
-        .pipe(sourcemaps.init())
-        .pipe(uglify({output: { comments: 'some'}}))
+        //.pipe(sourcemaps.init())
+        //.pipe(uglify({output: { comments: 'some'}}))
         .pipe(concat('kurve.min.js', {sep: ''}))
-        .pipe(sourcemaps.write('.'))
+        //.pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('./dist/js/'))
         .on('end', done);
 });

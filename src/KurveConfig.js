@@ -50,7 +50,7 @@ Kurve.Config = {
     
     Game: {
         menuStartDelay:5,
-        timeForRound: 30,
+        timeForRound: 1*60,
         startDelay: 1000,
         fps: 60,
         initialSuperpowerCount: 2,
@@ -67,10 +67,10 @@ Kurve.Config = {
     },
     
     Players: [
-        { id:'red',      keyLeft:49,   keyRight:81,   keySuperpower:65  },
+        // { id:'red',      keyLeft:49,   keyRight:81,   keySuperpower:65  },
         { id:'orange',   keyLeft:37,   keyRight:40,   keySuperpower:39  },
         // { id:'green',    keyLeft:89,   keyRight:88,   keySuperpower:67  },
-        // { id:'blue',     keyLeft:66,   keyRight:78,   keySuperpower:77  },
+        { id:'blue',     keyLeft:66,   keyRight:78,   keySuperpower:77  },
         // { id:'purple',   keyLeft:76,   keyRight:79,   keySuperpower:80  },
         // { id:'pink',     keyLeft:53,   keyRight:54,   keySuperpower:55  },
     ],

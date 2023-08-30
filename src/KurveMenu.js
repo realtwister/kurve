@@ -65,7 +65,7 @@ Kurve.Menu = {
 
     initMenuMusic: function() {
         this.audioPlayer = Kurve.Sound.getAudioPlayer();
-        this.audioPlayer.play('menu-music', {loop: true, background: true, fade: 2000, volume: 1});
+        // this.audioPlayer.play('menu-music', {loop: true, background: true, fade: 2000, volume: 1});
     },
     
     removeWindowListeners: function() {
@@ -87,7 +87,10 @@ Kurve.Menu = {
         }
 
         if (event.keyCode === 32) {
-            Kurve.Menu.onSpaceDown();
+            Kurve.players.forEach(function(player){
+                Kurve.Menu.activatePlayer(player.getId());
+                Kurve.Menu.audioPlayer.play('menu-navigate');
+            })
         }
 
         Kurve.players.forEach(function(player) {
@@ -172,10 +175,6 @@ Kurve.Menu = {
 
         u.addClass('hidden', 'layer-menu');
         u.removeClass('hidden', 'layer-game');
-    },
-    
-    onSpaceDown: function() {
-        this.startGame();
     },
 
     onNextSuperPowerClicked: function(event, playerId) {

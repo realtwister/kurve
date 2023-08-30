@@ -103,7 +103,7 @@ Kurve.Game = {
     onSpaceDown: function() {
         // if ( this.isGameOver ) return location.reload();
         // if ( this.isRunning || this.isPaused ) return this.togglePause();
-        if ( !this.isRoundStarted && !this.deathMatch) return this.startNewRound();
+        // if ( !this.isRoundStarted && !this.deathMatch) return this.startNewRound();
         if ( !this.isRoundStarted && this.deathMatch) return this.startDeathMatch();
     },
     
@@ -135,7 +135,7 @@ Kurve.Game = {
     
     startGame: function() {
         this.maxPoints = (this.curves.length - 1) * 10;
-        this.deathMatch = false;
+        this.deathMatch = true;
         
         this.addPlayers();
         this.addWindowListeners();
@@ -262,7 +262,7 @@ Kurve.Game = {
             curve.getPlayer().getSuperpower().close(curve);
         });
 
-        if ( this.deathMatch ) {
+        if ( this.deathMatch && this.Timer.timeLeft() <= 0) {
             var curve = this.runningCurves[Object.keys(this.runningCurves)[0]][0];
             this.gameOver(curve.getPlayer());
         }
@@ -373,18 +373,18 @@ Kurve.Game = {
             setTimeout(this.audioPlayer.play.bind(this.audioPlayer, 'game-start-in', {reset: true}), startIn2Delay);
             setTimeout(function() {
                 this.audioPlayer.play('game-start-out', {reset: true});
-                this.setAllCurvesMuted('all', false);
+                // this.setAllCurvesMuted('all', false);
 
-                if ( Kurve.Game.deathMatch ) {
-                    this.stemLevel = 3;
-                    this.audioPlayer.play('game-music-stem-1', {fade: this.defaultFadeTime, volume: 1, background: true, loop: true, reset: true});
-                    this.audioPlayer.play('game-music-stem-4', {fade: this.defaultFadeTime, volume: 1, background: true, loop: true, reset: true});
-                } else {
-                    this.stemLevel = 1;
-                    this.audioPlayer.play('game-music-stem-1', {fade: this.defaultFadeTime, volume: 1, background: true, loop: true, reset: true});
-                    this.audioPlayer.play('game-music-stem-2', {fade: this.defaultFadeTime, volume: 0, background: true, loop: true, reset: true});
-                    this.audioPlayer.play('game-music-stem-3', {fade: this.defaultFadeTime, volume: 0, background: true, loop: true, reset: true});
-                }
+                // if ( Kurve.Game.deathMatch ) {
+                //     this.stemLevel = 3;
+                //     this.audioPlayer.play('game-music-stem-1', {fade: this.defaultFadeTime, volume: 1, background: true, loop: true, reset: true});
+                //     this.audioPlayer.play('game-music-stem-4', {fade: this.defaultFadeTime, volume: 1, background: true, loop: true, reset: true});
+                // } else {
+                //     this.stemLevel = 1;
+                //     this.audioPlayer.play('game-music-stem-1', {fade: this.defaultFadeTime, volume: 1, background: true, loop: true, reset: true});
+                //     this.audioPlayer.play('game-music-stem-2', {fade: this.defaultFadeTime, volume: 0, background: true, loop: true, reset: true});
+                //     this.audioPlayer.play('game-music-stem-3', {fade: this.defaultFadeTime, volume: 0, background: true, loop: true, reset: true});
+                // }
             }.bind(this), startOutDelay);
         },
 
@@ -442,9 +442,9 @@ Kurve.Game = {
                 return;
             }
 
-            this.stemLevel = 3;
-            this.audioPlayer.setVolume('game-music-stem-2', {volume: 0.5, fade: this.defaultFadeTime});
-            this.audioPlayer.setVolume('game-music-stem-3', {volume: 0.3, fade: this.defaultFadeTime});
+            // this.stemLevel = 3;
+            // this.audioPlayer.setVolume('game-music-stem-2', {volume: 0.5, fade: this.defaultFadeTime});
+            // this.audioPlayer.setVolume('game-music-stem-3', {volume: 0.3, fade: this.defaultFadeTime});
         },
 
         initDeathMatch: function() {
